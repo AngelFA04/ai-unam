@@ -64,7 +64,7 @@ def explorar_nodo(nodo_actual, frontera, memoria, laberinto, path):
     frontera = frontera #
     memoria = memoria #
     
-    path = []
+    path = dict()
     
     print(f'** Explorando nodo {nodo_actual}...')
     for d in ['U','R','D','L']:
@@ -78,15 +78,51 @@ def explorar_nodo(nodo_actual, frontera, memoria, laberinto, path):
                 memoria.append(coord)
                 if new_node:
                     frontera.append(new_node)
-                    path.append(d)
-                
-                  
- 
+                    path[new_node] = dict()
+                    path[new_node][d] = True
+                # else:
+                #    path[new_node][d] = False
 
     return frontera, memoria, path
 
 
-def verificar_caminos():
+def verificar_caminos(paths):
+    paths = dict(paths)
+
+    empties = []
+        
+    for k,v in paths.items():
+        if v == dict():
+            empties.append(k)
+            print('Ahí te ves')
+    
+
+    while empties:
+        for k,v in paths.items():
+            for e in empties:
+                if e in v:
+                    print('Te encontre esponja')
+                    del paths[k][e]
+
+        for e in empties:
+            print('Te encontre esponja')
+            del paths[e]
+
+        for k, v in paths.items():
+            print(k,v)
+
+        empties = []
+
+        for k,v in paths.items():
+            if v == dict():
+                empties.append(k)
+                print('Ahí te ves')
+    
+    print('empties', empties)
+    
+    return [paths]
+
+def eliminar_vacio():
     pass
 
 
@@ -95,7 +131,7 @@ def buscar_salida(lab, origin, destiny):
     Return solution_path, number_visited_nodes
     """
     complete_path = ''
-    paths = []
+    paths = dict()
     origin = origin[0]-1, origin[1]-1
     destiny = destiny[0]-1, destiny[1]-1
     # Arriba, Derecha, Abajo, Izquierda
@@ -114,16 +150,20 @@ def buscar_salida(lab, origin, destiny):
         if nodo_actual == destiny:
             # 
             print('Destino encontrado: ', nodo_actual, '==', destiny)
-            print('El camino del señor:', complete_path)
-            print(len(memoria))
+            paths = verificar_caminos(paths)
+
+            print('El camino del señor:', paths)
+            # print(len(memoria))
         else:
             print('Generando nuevas fronteras...')
             frontera, memoria, path = explorar_nodo(nodo_actual, frontera, memoria, lab, complete_path)
-            paths.append((path,nodo_actual))
+            paths[nodo_actual] = (path)
         print('Caminito: ', paths)
         print('Frontera: ', frontera)
         print('------------------')
     
+    
+
     print('Memoria: ', memoria)
     
     # Regrar tupla de solucion sumandole 1

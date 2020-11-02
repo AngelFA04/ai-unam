@@ -79,14 +79,16 @@ def explorar_nodo(nodo_actual, frontera, memoria, laberinto, path):
                 if new_node:
                     frontera.append(new_node)
                     path[new_node] = dict()
-                    path[new_node][d] = True
+                    path[new_node][d] = True 
                 # else:
                 #    path[new_node][d] = False
 
     return frontera, memoria, path
 
-
 def verificar_caminos(paths):
+    """
+    Funcion para generar el camino correcto y más corto
+    """
     paths = dict(paths)
 
     empties = []
@@ -120,7 +122,12 @@ def verificar_caminos(paths):
     
     print('empties', empties)
     
-    return [paths]
+    result = []
+    for p in paths.values():
+        for v in p.values():
+            result.append(tuple(v)[0])
+    
+    return ''.join(result)
 
 def eliminar_vacio():
     pass
@@ -161,8 +168,6 @@ def buscar_salida(lab, origin, destiny):
         print('Caminito: ', paths)
         print('Frontera: ', frontera)
         print('------------------')
-    
-    
 
     print('Memoria: ', memoria)
     

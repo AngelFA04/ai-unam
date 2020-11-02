@@ -11,40 +11,51 @@ def verify_positive(x,y):
     return (lambda x,y: x>=0 and y>=0)(x,y) 
 
 
-def move(direccion, nodo_actual, lab):
+def move(direccion, nodo_actual, lab, path):
+    """Funcion para moverse en el plano
+    Arriba, Derecha, Abajo, Izquierda
+    """
     direcciones = {'U':[-1,0],'R': [0,1],'D':[1,0], 'L':[0,-1]}
 
     direction = direcciones[direccion]
     
     # Llevar registro de Path
-    path = ''
+    path = path
     
     try:
         coordenadas = (nodo_actual[0]+direction[0], nodo_actual[1]+direction[1])# Coordenadas que se generan si se mueva arriba
         
         if not verify_positive(coordenadas[0], coordenadas[1]):
-            return None
+            return None, coordenadas, direccion,'' 
         
         # print('-- nodo actual',nodo_actual[0], nodo_actual[1],'=',lab[nodo_actual[0]][nodo_actual[1]])
         print(f'--- nodo {direccion} actual',
                coordenadas[0], coordenadas[1],'=',
-               lab[coordenadas[0]][coordenadas[1]])
+               lab[coordenadas[0]][coordenadas[1]], end=' -> ')
 
         contenido = lab[coordenadas[0]][coordenadas[1]]
         
         if contenido == '#':
-            return None, coordenadas, direccion
+            return None, coordenadas, direccion, ''
         elif contenido == '.':
-            return coordenadas, coordenadas, direccion
+            return coordenadas, coordenadas, direccion, path
         elif contenido == 'D':
-            return coordenadas, coordenadas, direccion
+            return coordenadas, coordenadas, direccion, path
         else:
-            return None, coordenadas, direccion
+            return None, coordenadas, direccion, ''
     except IndexError:
         print('error: Index error')
-        return None, coordenadas, ''
+        return None, None, '', ''
 
-
+def oposite(direction):
+    if direction == 'D':
+        return 'U'
+    elif direction == 'U':
+        return 'D'
+    elif direction == 'L':
+        return 'R'
+    elif direction == 'R':
+        return 'L'
 
 
 def explorar_nodo(nodo_actual, frontera, memoria, laberinto, path):
@@ -52,34 +63,27 @@ def explorar_nodo(nodo_actual, frontera, memoria, laberinto, path):
     explora a los nodos visitables desde ahí """
     frontera = frontera #
     memoria = memoria #
-    path = path
-    print(f'** Explorando nodo {nodo_actual}...')
     
+    path = path
+    
+    print(f'** Explorando nodo {nodo_actual}...')
     for d in ['U','R','D','L']:
         print(d)
-        try:
-            new_node, coord, p = move(d, nodo_actual, laberinto)
-            print(new_node)
-            if coord and new_node not in memoria:
+        path = path+d
+        print(f'Path: \t {path}')
+        
+        new_node, coord, direction, path = move(d, nodo_actual, laberinto, path)
+        print(new_node)
+        if not oposite(direction) == d:
+            if coord and (new_node not in memoria):
                 memoria.append(coord)
                 if new_node:
                     frontera.append(new_node)
-                    path = f'{path}{p}'
-        except TypeError:
-                print('Nothing')
-        
+        if not new_node:
+            path = d            
+            #else:
+            #    path = ''
 
-    # arriba = move('U', nodo_actual, laberinto)
-    # print('-~ arriba', arriba)
-
-    # derecha = move('R', nodo_actual, laberinto)
-    # print('-~ derecha', derecha)
-
-    # abajo = move('D', nodo_actual, laberinto)
-    # print('-~ abajo', abajo)
-
-    # izquierda = move('L', nodo_actual, laberinto    )
-    # print('-~ izquierda', izquierda)
 
     return frontera, memoria, path
 
@@ -98,20 +102,17 @@ def buscar_salida(lab, origin, destiny):
     frontera.append(origin)
     memoria.append(origin)
     print('Buscando salida...')
-    print(frontera)
-    
-    print(destiny)
+    print('Frontera: ', frontera)
+
     while frontera:
         nodo_actual = frontera.popleft()
-        print(frontera)
+        print('Frontera: ', frontera)
+
         if nodo_actual == destiny:
             # 
             print('Destino encontrado: ', nodo_actual, '==', destiny)
-            print(path)
+            print('El camino del señor:', path)
             print(len(memoria))
-            # Regresar coordenada de destino
-            # Regrar tupla de solucion sumandole 1
-            # return nodo_actual
         else:
             print('Generando nuevas fronteras...')
             frontera, memoria, path = explorar_nodo(nodo_actual, frontera, memoria, lab, path)
@@ -141,8 +142,8 @@ def main():
     for i,l in enumerate(lab,0):
         print(i, '\t',l)
     
-    print(origin)
-    print(destiny)
+    print('Origen:', origin)
+    print('Destino:',destiny)
 
     buscar_salida(lab, origin, destiny)
 

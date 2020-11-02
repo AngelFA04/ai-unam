@@ -29,9 +29,9 @@ def move(direccion, nodo_actual, lab, path):
             return None, coordenadas, direccion,'' 
         
         # print('-- nodo actual',nodo_actual[0], nodo_actual[1],'=',lab[nodo_actual[0]][nodo_actual[1]])
-        print(f'--- nodo {direccion} actual',
-               coordenadas[0], coordenadas[1],'=',
-               lab[coordenadas[0]][coordenadas[1]], end=' -> ')
+        # print(f'--- nodo {direccion} actual',
+        #       coordenadas[0], coordenadas[1],'=',
+        #       lab[coordenadas[0]][coordenadas[1]], end=' -> ')
 
         contenido = lab[coordenadas[0]][coordenadas[1]]
         
@@ -64,35 +64,38 @@ def explorar_nodo(nodo_actual, frontera, memoria, laberinto, path):
     frontera = frontera #
     memoria = memoria #
     
-    path = path
+    path = []
     
     print(f'** Explorando nodo {nodo_actual}...')
     for d in ['U','R','D','L']:
-        print(d)
-        path = path+d
-        print(f'Path: \t {path}')
+        # print(d)
+        # print(f'Path: \t {path}')
         
-        new_node, coord, direction, path = move(d, nodo_actual, laberinto, path)
-        print(new_node)
+        new_node, coord, direction, p = move(d, nodo_actual, laberinto, path)
+        # print(new_node)
         if not oposite(direction) == d:
             if coord and (new_node not in memoria):
                 memoria.append(coord)
                 if new_node:
                     frontera.append(new_node)
-        if not new_node:
-            path = d            
-            #else:
-            #    path = ''
-
+                    path.append(d)
+                
+                  
+ 
 
     return frontera, memoria, path
+
+
+def verificar_caminos():
+    pass
 
 
 def buscar_salida(lab, origin, destiny):
     """
     Return solution_path, number_visited_nodes
     """
-    path = ''
+    complete_path = ''
+    paths = []
     origin = origin[0]-1, origin[1]-1
     destiny = destiny[0]-1, destiny[1]-1
     # Arriba, Derecha, Abajo, Izquierda
@@ -111,12 +114,15 @@ def buscar_salida(lab, origin, destiny):
         if nodo_actual == destiny:
             # 
             print('Destino encontrado: ', nodo_actual, '==', destiny)
-            print('El camino del señor:', path)
+            print('El camino del señor:', complete_path)
             print(len(memoria))
         else:
             print('Generando nuevas fronteras...')
-            frontera, memoria, path = explorar_nodo(nodo_actual, frontera, memoria, lab, path)
+            frontera, memoria, path = explorar_nodo(nodo_actual, frontera, memoria, lab, complete_path)
+            paths.append((path,nodo_actual))
+        print('Caminito: ', paths)
         print('Frontera: ', frontera)
+        print('------------------')
     
     print('Memoria: ', memoria)
     

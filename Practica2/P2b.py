@@ -11,9 +11,6 @@ def verify_positive(x, y):
 def move(direccion, nodo_actual, lab):
     """Funcion para moverse en el plano
     Arriba, Derecha, Abajo, Izquierda
-    El primer elemento de la tupla es la coordenada del nuevo nodo
-    si la casilla visitada no es valida se regresa None
-    return (node_valid, coordenadas_visitadas, direccion)
     """
     direcciones = {'U': [-1, 0], 'R': [0, 1], 'D': [1, 0], 'L': [0, -1]}
 
@@ -59,13 +56,12 @@ def explorar_nodo(nodo_actual, frontera, memoria, laberinto):
 
     relations = list()
 
-    for d in ['U', 'R', 'D', 'L']:
+    for d in ['U', 'R', 'D', 'L'][::-1]:
         new_node, coord, direction = move(d, nodo_actual, laberinto)
         # print(new_node)
         if not oposite(direction) == d:
             if coord and (new_node not in memoria):
                 memoria.append(coord)
-                # Only if there is a node valid
                 if new_node:
                     frontera.append(new_node)
                     relations.append(Node(new_node, parent=nodo_actual,
@@ -90,8 +86,49 @@ def ver_caminos(target, path):
         path_string = f'{path_string}{current.direction}'
         current = find_child(child=current.parent, nodes=path)
 
-
     return path_string[::-1]
+
+
+def verificar_caminos(paths):
+    """
+    Funcion para generar el camino correcto y más corto
+    """
+    paths = dict(paths)
+    total = (len(paths))
+    empties = []
+
+    for k, v in paths.items():
+        print(k, v)
+
+    for k, v in paths.items():
+        if v == dict():
+            empties.append(k)
+
+    while empties:
+        for k, v in paths.items():
+            for e in empties:
+                if e in v:
+                    del paths[k][e]
+        for e in empties:
+            del paths[e]
+
+        empties = []
+
+        for k, v in paths.items():
+            if v == dict():
+                empties.append(k)
+
+    result = []
+    for p in paths.values():
+        for v in p.values():
+            result.append(tuple(v)[0])
+
+    print('----------------')
+
+    for k, v in paths.items():
+        print(k, v)
+
+    return ''.join(result), total
 
 
 def buscar_salida(lab, origin, destiny):
@@ -101,20 +138,21 @@ def buscar_salida(lab, origin, destiny):
     paths = list()
     origin = origin[0]-1, origin[1]-1
     destiny = destiny[0]-1, destiny[1]-1
-    explorados = set()
-    # Arriba, Derecha, Abajo, Izquierda
+
     frontera = deque()
     memoria = deque()
+    explorados = set()
+
     frontera.append(origin)
     memoria.append(origin)
     # print('Buscando salida...')
     # print('Frontera: ', frontera)
 
     paths.append(Node(origin, parent=None))
-
+    
     while frontera:
         # print(frontera)
-        nodo_actual = frontera.popleft()
+        nodo_actual = frontera.pop()
         # print('Frontera: ', frontera)
         if nodo_actual == destiny:
             # print('Destino encontrado: ', nodo_actual, '==', destiny)

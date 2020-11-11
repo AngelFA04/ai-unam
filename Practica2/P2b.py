@@ -82,53 +82,11 @@ def ver_caminos(target, path):
         # print(p.child, p.parent, p.direction)
 
     # print('Current', current)
-    while current.parent != None:
+    while current.parent is not None:
         path_string = f'{path_string}{current.direction}'
         current = find_child(child=current.parent, nodes=path)
 
     return path_string[::-1]
-
-
-def verificar_caminos(paths):
-    """
-    Funcion para generar el camino correcto y más corto
-    """
-    paths = dict(paths)
-    total = (len(paths))
-    empties = []
-
-    for k, v in paths.items():
-        print(k, v)
-
-    for k, v in paths.items():
-        if v == dict():
-            empties.append(k)
-
-    while empties:
-        for k, v in paths.items():
-            for e in empties:
-                if e in v:
-                    del paths[k][e]
-        for e in empties:
-            del paths[e]
-
-        empties = []
-
-        for k, v in paths.items():
-            if v == dict():
-                empties.append(k)
-
-    result = []
-    for p in paths.values():
-        for v in p.values():
-            result.append(tuple(v)[0])
-
-    print('----------------')
-
-    for k, v in paths.items():
-        print(k, v)
-
-    return ''.join(result), total
 
 
 def buscar_salida(lab, origin, destiny):
@@ -149,7 +107,7 @@ def buscar_salida(lab, origin, destiny):
     # print('Frontera: ', frontera)
 
     paths.append(Node(origin, parent=None))
-    
+
     while frontera:
         # print(frontera)
         nodo_actual = frontera.pop()

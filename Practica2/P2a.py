@@ -86,10 +86,9 @@ def ver_caminos(target, path):
         # print(p.child, p.parent, p.direction)
 
     # print('Current', current)
-    while current.parent != None:
+    while current.parent is not None:
         path_string = f'{path_string}{current.direction}'
         current = find_child(child=current.parent, nodes=path)
-
 
     return path_string[::-1]
 
